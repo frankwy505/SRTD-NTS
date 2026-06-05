@@ -1,5 +1,7 @@
 from .metrics import (
     core_mst_edges,
+    linear_cka,
+    max_rtd_lite,
     nts_e,
     nts_m,
     nts_metrics,
@@ -12,6 +14,8 @@ from .metrics import (
 
 __all__ = [
     "core_mst_edges",
+    "linear_cka",
+    "max_rtd_lite",
     "nts_e",
     "nts_m",
     "nts_metrics",
@@ -21,4 +25,3 @@ __all__ = [
     "srtd_lite_barcode",
     "srtd_score",
 ]
-

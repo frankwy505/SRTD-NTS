@@ -182,6 +182,25 @@ def nts_metrics(distance_matrix_1: np.ndarray, distance_matrix_2: np.ndarray) ->
     }
 
 
+def linear_cka(representation_1: np.ndarray, representation_2: np.ndarray, *, eps: float = 1e-12) -> float:
+    x = np.asarray(representation_1, dtype=float)
+    y = np.asarray(representation_2, dtype=float)
+    if x.ndim != 2 or y.ndim != 2:
+        raise ValueError("Representations must be two-dimensional arrays.")
+    if x.shape[0] != y.shape[0]:
+        raise ValueError("Representations must have the same number of samples.")
+
+    x_centered = x - x.mean(axis=0, keepdims=True)
+    y_centered = y - y.mean(axis=0, keepdims=True)
+
+    cross_covariance = y_centered.T @ x_centered
+    hsic_xy = float((cross_covariance * cross_covariance).sum())
+    hsic_xx = float(((x_centered.T @ x_centered) ** 2).sum())
+    hsic_yy = float(((y_centered.T @ y_centered) ** 2).sum())
+    denominator = np.sqrt(max(hsic_xx * hsic_yy, eps))
+    return float(hsic_xy / denominator)
+
+
 def rtd_lite(
     distance_matrix_1: np.ndarray,
     distance_matrix_2: np.ndarray,
@@ -212,6 +231,19 @@ def srtd_lite(distance_matrix_1: np.ndarray, distance_matrix_2: np.ndarray, *, q
     matrix_min = np.minimum(matrix_1, matrix_2)
     matrix_max = np.maximum(matrix_1, matrix_2)
     value = mst(matrix_max).total_weight - mst(matrix_min).total_weight
+    return float(max(0.0, value))
+
+
+def max_rtd_lite(distance_matrix_1: np.ndarray, distance_matrix_2: np.ndarray, *, q: float = 0.90) -> float:
+    matrix_1, matrix_2 = validate_pair(distance_matrix_1, distance_matrix_2)
+    matrix_1 = normalize_by_quantile(matrix_1, q=q)
+    matrix_2 = normalize_by_quantile(matrix_2, q=q)
+    matrix_max = np.maximum(matrix_1, matrix_2)
+
+    mst_1 = mst(matrix_1).total_weight
+    mst_2 = mst(matrix_2).total_weight
+    mst_max = mst(matrix_max).total_weight
+    value = mst_max - 0.5 * (mst_1 + mst_2)
     return float(max(0.0, value))
 
 
@@ -269,6 +301,7 @@ def rtd_srtd_lite_metrics(distance_matrix_1: np.ndarray, distance_matrix_2: np.n
         "RTD_lite_dir_12": float(max(0.0, rtd_12)),
         "RTD_lite_dir_21": float(max(0.0, rtd_21)),
         "SRTD_lite": float(max(0.0, mst_max - mst_min)),
+        "Max_RTD_lite": float(max(0.0, mst_max - 0.5 * (mst_1 + mst_2))),
     }
 
 
@@ -326,4 +359,3 @@ def srtd_score(
         finite = np.isfinite(diagram[:, 0]) & np.isfinite(diagram[:, 1])
         scores[dim] = float(np.sum(diagram[finite, 1] - diagram[finite, 0]))
     return scores
-
