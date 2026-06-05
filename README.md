@@ -1,8 +1,6 @@
 # SRTD-NTS
 
-Code for **Symmetric Divergence and Normalized Similarity: A Unified Topological Framework for Representation Analysis**.
-
-Paper status: **Accepted by TMLR**.
+Code for **Symmetric Divergence and Normalized Similarity: A Unified Topological Framework for Representation Analysis**.Accepted by TMLR.
 
 This repository currently contains a clean minimal implementation of the core representation-analysis scores from the paper:
 
