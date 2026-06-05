@@ -2,7 +2,7 @@
 
 Code for **Symmetric Divergence and Normalized Similarity: A Unified Topological Framework for Representation Analysis**.
 
-Paper status: the [OpenReview record](https://openreview.net/forum?id=pGgJ9qB2Io) currently lists the submission as decision pending for TMLR, with a public recommendation of **Accept as is**.
+Paper status: **Accepted by TMLR**.
 
 This repository currently contains a clean minimal implementation of the core representation-analysis scores from the paper:
 
