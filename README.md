@@ -52,9 +52,20 @@ python examples/synthetic_clusters.py --out outputs/synthetic_clusters.csv
 
 The script recreates the cluster-splitting experiment from the research notebooks with the cleaned package implementations. It reports NTS-E/NTS-M, RTD-lite, SRTD-lite, SRTD-lite/2, Max-RTD-lite, and linear CKA. Add `--plot` to save figures if `matplotlib` is installed.
 
+## References and Acknowledgements
+
+This code builds on ideas and tools from prior topological representation analysis work:
+
+- **RTD**: the original Representation Topology Divergence paper by Barannikov, Trofimov, Balabin, and Burnaev, with the official repository at [IlyaTrofimov/RTD](https://github.com/IlyaTrofimov/RTD).
+- **RTD-Lite**: the scalable MST-based RTD-Lite method by Tulchinskii, Voronkova, Trofimov, Burnaev, and Barannikov, with the official repository at [ArGintum/RTD-Lite](https://github.com/ArGintum/RTD-Lite).
+- **Ripser++**: the optional full persistent-homology path uses `ripserplusplus`, the GPU-accelerated Vietoris-Rips persistence software by Simon Zhang, Mengbai Xiao, and Hao Wang. The Ripser++ project also credits Birkan Gokbag and Ryan DeMilt as contributors. Ripser++ is built on **Ripser**, written by Ulrich Bauer.
+
+See [CITATION.bib](CITATION.bib) for BibTeX entries. The lite metrics and NTS metrics in this repository are implemented independently in NumPy/SciPy; upstream RTD, RTD-Lite, Ripser, and Ripser++ code is not vendored here.
+
 ## Repository Layout
 
 ```text
+CITATION.bib       BibTeX entries for related work and optional dependencies
 src/srtd_nts/
   metrics.py        Core NTS, CKA, RTD-lite, SRTD-lite, and optional full SRTD scores
 examples/
