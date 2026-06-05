@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "srtd-nts"
 version = "0.1.0"
-description = "Topological representation analysis metrics: SRTD, SRTD-lite, and NTS."
+description = "Topological representation analysis scores: SRTD, SRTD-lite, and NTS."
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [

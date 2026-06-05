@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
-from srtd_nts import linear_cka, nts_metrics, rtd_srtd_lite_metrics
+from srtd_nts import linear_cka, nts_scores, rtd_srtd_lite_scores
 
 
 DEFAULT_K_VALUES = (1, 2, 3, 4, 5, 6, 10, 12)
@@ -59,8 +59,8 @@ def run_experiment(
         shifted_points = split_clusters(groups, k)
         shifted_distance = distance_matrix(shifted_points)
 
-        nts = nts_metrics(base_distance, shifted_distance)
-        lite = rtd_srtd_lite_metrics(base_distance, shifted_distance, q=q)
+        nts = nts_scores(base_distance, shifted_distance)
+        lite = rtd_srtd_lite_scores(base_distance, shifted_distance, q=q)
         cka = linear_cka(base_points, shifted_points)
 
         rows.append(
@@ -118,10 +118,10 @@ def plot_rows(rows: list[dict[str, int | float]], output_dir: Path) -> None:
         ("rtd_lite", ("RTD_lite", "SRTD_lite_half", "Max_RTD_lite"), "Divergence"),
         ("cka", ("CKA",), "Similarity"),
     ]
-    for name, metrics, ylabel in figure_specs:
+    for name, series_names, ylabel in figure_specs:
         fig, ax = plt.subplots(figsize=(7, 5))
-        for metric in metrics:
-            ax.plot(k_values, [row[metric] for row in rows], marker="o", label=metric)
+        for series_name in series_names:
+            ax.plot(k_values, [row[series_name] for row in rows], marker="o", label=series_name)
         ax.set_xlabel("Number of clusters")
         ax.set_ylabel(ylabel)
         ax.set_xticks(k_values)
@@ -135,7 +135,7 @@ def plot_rows(rows: list[dict[str, int | float]], output_dir: Path) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the synthetic cluster representation experiment.")
     parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--q", type=float, default=0.90, help="Quantile normalization for lite metrics.")
+    parser.add_argument("--q", type=float, default=0.90, help="Quantile normalization for lite scores.")
     parser.add_argument(
         "--k-values",
         type=int,

@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.spatial.distance import pdist, squareform
 
-from srtd_nts import nts_metrics, rtd_srtd_lite_metrics, srtd_lite_barcode
+from srtd_nts import nts_scores, rtd_srtd_lite_scores, srtd_lite_barcode
 
 
 def main() -> None:
@@ -13,10 +13,10 @@ def main() -> None:
     distance_y = squareform(pdist(y, metric="euclidean"))
 
     print("NTS:")
-    print(nts_metrics(distance_x, distance_y))
+    print(nts_scores(distance_x, distance_y))
 
     print("\nRTD-lite / SRTD-lite:")
-    print(rtd_srtd_lite_metrics(distance_x, distance_y))
+    print(rtd_srtd_lite_scores(distance_x, distance_y))
 
     print("\nFirst five SRTD-lite barcode intervals:")
     print(srtd_lite_barcode(distance_x, distance_y)[:5])
@@ -24,4 +24,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

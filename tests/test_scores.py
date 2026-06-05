@@ -5,7 +5,9 @@ from srtd_nts import (
     linear_cka,
     max_rtd_lite,
     nts_metrics,
+    nts_scores,
     rtd_srtd_lite_metrics,
+    rtd_srtd_lite_scores,
     srtd_lite,
     srtd_lite_barcode,
 )
@@ -20,18 +22,24 @@ def _distance_matrices():
 
 def test_nts_identical_matrices_are_one():
     distance_x, _ = _distance_matrices()
-    metrics = nts_metrics(distance_x, distance_x)
-    assert np.isclose(metrics["NTS_E"], 1.0)
-    assert np.isclose(metrics["NTS_M"], 1.0)
+    scores = nts_scores(distance_x, distance_x)
+    assert np.isclose(scores["NTS_E"], 1.0)
+    assert np.isclose(scores["NTS_M"], 1.0)
 
 
-def test_lite_metrics_are_nonnegative():
+def test_lite_scores_are_nonnegative():
     distance_x, distance_y = _distance_matrices()
-    metrics = rtd_srtd_lite_metrics(distance_x, distance_y)
-    assert metrics["RTD_lite"] >= 0.0
-    assert metrics["SRTD_lite"] >= 0.0
-    assert metrics["Max_RTD_lite"] >= 0.0
-    assert np.isclose(metrics["Max_RTD_lite"], max_rtd_lite(distance_x, distance_y))
+    scores = rtd_srtd_lite_scores(distance_x, distance_y)
+    assert scores["RTD_lite"] >= 0.0
+    assert scores["SRTD_lite"] >= 0.0
+    assert scores["Max_RTD_lite"] >= 0.0
+    assert np.isclose(scores["Max_RTD_lite"], max_rtd_lite(distance_x, distance_y))
+
+
+def test_legacy_named_aliases_remain_available():
+    distance_x, distance_y = _distance_matrices()
+    assert nts_metrics(distance_x, distance_y) == nts_scores(distance_x, distance_y)
+    assert rtd_srtd_lite_metrics(distance_x, distance_y) == rtd_srtd_lite_scores(distance_x, distance_y)
 
 
 def test_srtd_lite_matches_barcode_sum():
@@ -58,8 +66,8 @@ def test_synthetic_cluster_k2_regression():
 
     distance_base = squareform(pdist(base))
     distance_shifted = squareform(pdist(np.concatenate(shifted)))
-    nts = nts_metrics(distance_base, distance_shifted)
-    lite = rtd_srtd_lite_metrics(distance_base, distance_shifted)
+    nts = nts_scores(distance_base, distance_shifted)
+    lite = rtd_srtd_lite_scores(distance_base, distance_shifted)
 
     assert np.isclose(nts["NTS_E"], 0.286550, atol=1e-6)
     assert np.isclose(nts["NTS_M"], 0.336100, atol=1e-6)
