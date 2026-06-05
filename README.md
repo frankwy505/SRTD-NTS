@@ -2,6 +2,8 @@
 
 Code for **Symmetric Divergence and Normalized Similarity: A Unified Topological Framework for Representation Analysis**.
 
+Paper status: the [OpenReview record](https://openreview.net/forum?id=pGgJ9qB2Io) currently lists the submission as decision pending for TMLR, with a public recommendation of **Accept as is**.
+
 This repository currently contains a clean minimal implementation of the core representation-analysis scores from the paper:
 
 - **NTS-E** and **NTS-M**: normalized topological similarity scores based on MST core edges.
