@@ -12,6 +12,8 @@ from .scores import (
     srtd_lite,
     srtd_lite_barcode,
     srtd_score,
+    symmetric_auxiliary_matrix,
+    symmetric_auxiliary_sparse_matrix,
 )
 
 __all__ = [
@@ -28,4 +30,6 @@ __all__ = [
     "srtd_lite",
     "srtd_lite_barcode",
     "srtd_score",
+    "symmetric_auxiliary_matrix",
+    "symmetric_auxiliary_sparse_matrix",
 ]

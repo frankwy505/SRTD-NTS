@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Iterable, Sequence
 
 import numpy as np
+from scipy.sparse import coo_matrix
 from scipy.sparse.csgraph import minimum_spanning_tree
 from scipy.stats import spearmanr
 
@@ -25,6 +26,8 @@ __all__ = [
     "srtd_lite",
     "srtd_lite_barcode",
     "srtd_score",
+    "symmetric_auxiliary_matrix",
+    "symmetric_auxiliary_sparse_matrix",
 ]
 
 
@@ -336,6 +339,18 @@ def symmetric_auxiliary_matrix(
     *,
     q: float = 0.90,
 ) -> np.ndarray:
+    """Construct the dense full-SRTD auxiliary matrix ``M_sym``.
+
+    This is Matrix 1a in the paper:
+
+    ``[[w_max, (w_max^+)^T, 0],
+       [w_max^+, w_min,       inf],
+       [0,       inf,         0]]``
+
+    where ``M^+`` is obtained by replacing the strict upper-triangular part of
+    ``M`` with infinity. Inputs are first normalized by their 0.9 quantiles by
+    default, matching the full SRTD algorithm in the appendix.
+    """
     matrix_1, matrix_2 = validate_pair(distance_matrix_1, distance_matrix_2)
     matrix_1 = normalize_by_quantile(matrix_1, q=q)
     matrix_2 = normalize_by_quantile(matrix_2, q=q)
@@ -358,6 +373,28 @@ def symmetric_auxiliary_matrix(
     return np.concatenate([row_1, row_2, row_3], axis=0)
 
 
+def symmetric_auxiliary_sparse_matrix(
+    distance_matrix_1: np.ndarray,
+    distance_matrix_2: np.ndarray,
+    *,
+    q: float = 0.90,
+) -> coo_matrix:
+    """Construct ``M_sym`` as sparse finite lower-triangular COO entries.
+
+    Missing sparse entries represent the infinite entries in Matrix 1a. Explicit
+    zero-weight off-diagonal edges, such as ``(O, v_i)`` and ``(v_i, v'_i)``,
+    are preserved because they are part of the mapping-cone construction.
+    """
+    auxiliary = symmetric_auxiliary_matrix(distance_matrix_1, distance_matrix_2, q=q)
+    rows, cols = np.tril_indices(auxiliary.shape[0], k=-1)
+    values = auxiliary[rows, cols]
+    finite = np.isfinite(values)
+    return coo_matrix(
+        (values[finite], (rows[finite], cols[finite])),
+        shape=auxiliary.shape,
+    )
+
+
 def srtd_score(
     distance_matrix_1: np.ndarray,
     distance_matrix_2: np.ndarray,
@@ -370,10 +407,8 @@ def srtd_score(
     except ImportError as exc:
         raise ImportError("srtd_score requires ripserplusplus to be installed.") from exc
 
-    auxiliary = symmetric_auxiliary_matrix(distance_matrix_1, distance_matrix_2, q=q)
-    auxiliary = (auxiliary + auxiliary.T) / 2.0
-    np.fill_diagonal(auxiliary, 0.0)
-    result = rpp_py.run(f"--format distance --dim {max_dim}", auxiliary)
+    auxiliary = symmetric_auxiliary_sparse_matrix(distance_matrix_1, distance_matrix_2, q=q)
+    result = rpp_py.run(f"--format sparse --dim {max_dim}", auxiliary)
 
     scores: dict[int, float] = {}
     for dim in range(max_dim + 1):

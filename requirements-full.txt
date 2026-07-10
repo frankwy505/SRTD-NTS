@@ -1,0 +1,2 @@
+-r requirements.txt
+ripserplusplus @ git+https://github.com/ArGintum/RipserZeros.git@bac8a96f56e9e3ed46202323accbeeee11c4b54c
